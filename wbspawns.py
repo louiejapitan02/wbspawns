@@ -1,15 +1,20 @@
+import fbchat
 from fbchat import Client
 from fbchat.models import *
+from fbchat import Client, Thread, Message, ThreadLocation
 import json
 import time
-from datetime import datetime
+from datetime import datetime  
 from datetime import timedelta
+import re
+fbchat._util.USER_AGENTS    = ["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36"]
+fbchat._state.FB_DTSG_REGEX = re.compile(r'"name":"fb_dtsg","value":"(.*?)"')
 
 class RunMonitoring():
     def __init__(self):
         print("Initializing script...")
-        client = Client("wesgibs20@gmail.com", "relictuswbspawn20")
-        thread_id = "3494311873939189"
+        client = Client("louiejapitan2001@gmail.com", "kgyo1061d")
+        thread_id = "4560113830725467"
         thread_type = ThreadType.GROUP
         prev_messages = []
         spawn_time = {
@@ -19,32 +24,28 @@ class RunMonitoring():
             "lake": 6,
             "loran": 8
         }
-
         while(True):
-            messages = client.fetchThreadMessages(thread_id=thread_id, limit=10)
+            messages = client.fetchThreadMessages(thread_id=thread_id, limit=3)
             messages.reverse()
             for message in messages:
                 read_status = f'{message.text}-{message.timestamp}' in prev_messages
                 if read_status == False:
                     prev_messages.append(f'{message.text}-{message.timestamp}')
-                    if message.text == "/wbspawn":
-                        return_message = self.wbspawntime()
+                    if message.text.startswith('/wbset'):
+                        digest = message.text.split(' ')
+                        if len(digest) == 3:
+                            return_message = self.spawnSet(digest[1], digest[2])
+                            client.send(Message(text=return_message), thread_id=thread_id, thread_type=thread_type)
+                        else:
+                            return_message = f'Wrong format type /help'
+                            client.send(Message(text=return_message), thread_id=thread_id, thread_type=thread_type)
+                    elif message.text == "/wbspawn":
+                        return_message = self.doSomething()
+                        print(self.doSomething())
                         client.send(Message(text=return_message), thread_id=thread_id, thread_type=thread_type)
                     elif message.text == "/wbscam":
                         return_message = "Ulol na Ulol"
                         client.send(Message(text=return_message), thread_id=thread_id, thread_type=thread_type)
-                    elif "/wbset" in message.text:
-                        digest = message.text.split(' ')
-                        if len(digest) == 3:
-                            with open('timestamps.json') as json_file:
-                                data = json.load(json_file)
-                                keys = list(data)
-                                if digest[1] in keys:
-                                    new_time = datetime.strptime(digest[2], '%H:%M') + timedelta(hours=spawn_time[digest[1]])
-                                    data[digest[1]] = new_time.strftime('%H:%M')
-                                    with open('timestamps.json', 'w') as outfile:
-                                        json.dump(data, outfile)
-                                        client.send(Message(text=f'{digest[1]} spawn time: {data[digest[1]]}'), thread_id=thread_id, thread_type=thread_type)
                     elif message.text == "/sinolooter":
                         return_message = "Zem dakilang looter"
                         client.send(Message(text=return_message), thread_id=thread_id, thread_type=thread_type)
@@ -55,35 +56,38 @@ class RunMonitoring():
                         return_message = "Relictus lang malakas"
                         client.send(Message(text=return_message), thread_id=thread_id, thread_type=thread_type)
                     elif message.text == "/latestcode":
-                        return_message = "Vvxjtpo5Qn (November 1, 2020)"
+                        return_message = "Vvxjtpo5Qn (November 1, 2020)\n\nvhaz5npul (2k PDO)"
                         client.send(Message(text=return_message), thread_id=thread_id, thread_type=thread_type)
+                    elif message.text == "/help":
+                        return_message = self.help()
+                        print(self.help())
+                        client.send(Message(text=return_message), thread_id=thread_id, thread_type=thread_type)
+                    else:
+                        pass
             time.sleep(3)
 
-    def wbspawntime(self):
-
-        return_message = " "
-
+    def doSomething(self):
+        returnMessage = ""
         spawn_loc = [
-            ['soul', 'harvest/elf land', '0'],
-            ['8i', 'karben/zahara', '0'],
-            ['saint', 'wildland', '0'],
-            ['lake', 'dawn/forest', '0'],
-            ['loran', 'rift/relic', '0']
-        ]
-
+        ['soul', 'harvest/elf land', '0'],
+        ['8i', 'karben/zahara', '0'],
+        ['saint', 'wildland', '0'],
+        ['lake', 'dawn/forest', '0'],
+        ['loran', 'rift/relic', '0']
+    ]
         with open('timestamps.json') as json_file:
             data = json.load(json_file)
-            keys = list(data)
+            
+            spawn_loc[0][2] = data['soul']
+            spawn_loc[1][2] = data['8i']
+            spawn_loc[2][2] = data['saint']
+            spawn_loc[3][2] = data['lake']
+            spawn_loc[4][2] = data['loran']
+            print(f"spawn_loc->{spawn_loc[0][2] }")
 
-        spawn_loc[0][2] = keys['soul']
-        spawn_loc[1][2] = keys['8i']
-        spawn_loc[2][2] = keys['saint']
-        spawn_loc[3][2] = keys['lake']
-        spawn_loc[4][2] = keys['loran']
-
-        for key in range(len(spawn_loc) - 1):
+        for key in range(len(spawn_loc)-1,0,-1):
             for sort in range(key):
-                if int(spawn_loc[sort][2][0:2]) >= int(spawn_loc[sort + 1][2][0:2]):
+                if int(spawn_loc[sort][2][0:2]) >= int(spawn_loc[sort+1][2][0:2]):
                     if int(spawn_loc[sort][2][0:2]) == int(spawn_loc[sort + 1][2][0:2]):
                         if int(spawn_loc[sort][2][3:5]) > int(spawn_loc[sort + 1][2][3:5]):
                             temp = spawn_loc[sort]
@@ -93,11 +97,54 @@ class RunMonitoring():
                         temp = spawn_loc[sort]
                         spawn_loc[sort] = spawn_loc[sort + 1]
                         spawn_loc[sort + 1] = temp
+
         time2 = 0
         while time2 < 5:
-            return_message += f'{spawn_loc[time2][0]}  -   {spawn_loc[time2][2]}\n{spawn_loc[time2][1]}\n'
-            time2 += 1
-        return return_message
+            returnMessage += f'{spawn_loc[time2][0]}    -   {spawn_loc[time2][2]}\n{spawn_loc[time2][1]}\n'
+            time2 = time2 + 1
+        return returnMessage
+
+    def spawnSet(self, location, time):
+        returnMessage = ""
+        test = "/wbset "+location + " "+ time
+        spawn_time = {
+            "soul": 2,
+            "8i": 3,
+            "saint": 4,
+            "lake": 6,
+            "loran": 8
+        }
+        digest = test.split(' ')
+        timeformat = "%H:%M"
+        with open('timestamps.json') as json_file:
+            data = json.load(json_file)
+            keys = list(data)
+
+        if digest[1] in keys:
+            try:
+                validtime = datetime.strptime(digest[2], timeformat)
+                new_time = datetime.strptime(digest[2], '%H:%M') + timedelta(hours=spawn_time[digest[1]])
+                data[digest[1]] = new_time.strftime('%H:%M')
+                with open('timestamps.json', 'w') as outfile:
+                    json.dump(data, outfile)
+                    returnMessage = f'{digest[1]} spawn time: {data[digest[1]]}'
+                return returnMessage
+            except ValueError:
+                returnMessage = f'Wrong time H:M'
+            return returnMessage
+        else:
+            returnMessage = f'Wrong name or time format'
+        return returnMessage
+
+
+    def help(self):
+        returnMessage = ""
+        help = ['/wbspawn', '/wbset name time', '/latestcode', '/wbscam', '/sinolooter', '/sinomanyak', '/sinomalakas']
+        time2 = 0
+        while time2 < 7:
+            returnMessage += f'{help[time2]}\n'
+            time2 = time2 + 1
+        return returnMessage
 
 if __name__ == "__main__":
     RunMonitoring()
