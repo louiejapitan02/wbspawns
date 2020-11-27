@@ -13,9 +13,9 @@ fbchat._state.FB_DTSG_REGEX = re.compile(r'"name":"fb_dtsg","value":"(.*?)"')
 class RunMonitoring():
     def __init__(self):
         print("Initializing script...")
-        client = Client("xxxx", "xxx")
-        thread_id = "xx"
-        thread_id2 = "xx"
+        client = Client("bryanbilatan022@gmail.com", "kgytds153")
+        thread_id = "3288914904539462"
+        thread_id2 = "3494311873939189"
         thread_type = ThreadType.GROUP
         prev_messages = []
         spawn_time = {
@@ -29,7 +29,8 @@ class RunMonitoring():
 
 
         while(True):
-            messages = client.fetchThreadMessages(thread_id=thread_id, limit=1)
+            time.sleep(3)
+            messages = client.fetchThreadMessages(thread_id=thread_id, limit=4)
             messages.reverse()
             for message in messages:
                 read_status = f'{message.text}-{message.timestamp}' in prev_messages
@@ -83,27 +84,27 @@ class RunMonitoring():
                             if Advance_time.hour == int(Wb_time[timer][1][0:2]):
                                 if Advance_time.minute == int(Wb_time[timer][1][3:5]):
                                     if Advance_time.second == 11:
-                                        return_message = f'{Wb_time[timer][0]} 5 mins Before RS'
+                                        return_message = f'{Wb_time[timer][0]} is about to respawn'
                                         client.send(Message(text=return_message), thread_id=thread_id, thread_type=thread_type)
                                         client.send(Message(text=return_message), thread_id=thread_id2, thread_type=thread_type)
                                         time.sleep(1)
                                     elif Advance_time.second == 12:
-                                        return_message = f'{Wb_time[timer][0]} 5 mins Before RS'
+                                        return_message = f'{Wb_time[timer][0]} is about to respawn'
                                         client.send(Message(text=return_message), thread_id=thread_id, thread_type=thread_type)
                                         client.send(Message(text=return_message), thread_id=thread_id2, thread_type=thread_type)
                                         time.sleep(1)
                                     elif Advance_time.second == 13:
-                                        return_message = f'{Wb_time[timer][0]} 5 mins Before RS'
+                                        return_message = f'{Wb_time[timer][0]} is about to respawn'
                                         client.send(Message(text=return_message), thread_id=thread_id, thread_type=thread_type)
                                         client.send(Message(text=return_message), thread_id=thread_id2, thread_type=thread_type)
                                         time.sleep(1)
                                     elif Advance_time.second == 14:
-                                        return_message = f'{Wb_time[timer][0]} 5 mins Before RS'
+                                        return_message = f'{Wb_time[timer][0]} is about to respawn'
                                         client.send(Message(text=return_message), thread_id=thread_id, thread_type=thread_type)
                                         client.send(Message(text=return_message), thread_id=thread_id2, thread_type=thread_type)
                                         time.sleep(1)
                                     elif Advance_time.second == 15:
-                                        return_message = f'{Wb_time[timer][0]} 5 mins Before RS'
+                                        return_message = f'{Wb_time[timer][0]} is about to respawn'
                                         client.send(Message(text=return_message), thread_id=thread_id, thread_type=thread_type)
                                         client.send(Message(text=return_message), thread_id=thread_id2, thread_type=thread_type)
                                         time.sleep(1)
@@ -114,7 +115,7 @@ class RunMonitoring():
                             else:
                                 pass
                             timer += 1
-                            time.sleep(3)
+
 
 
 
